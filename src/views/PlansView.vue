@@ -117,6 +117,13 @@ function removePlan(plan: StudyPlan): void {
   plansStore.removePlan(plan.id)
   ElMessage.success('计划已删除')
 }
+
+function duplicatePlan(plan: StudyPlan): void {
+  const copy = plansStore.duplicatePlan(plan.id)
+  if (!copy) return
+  ElMessage.success('已生成副本，可直接编辑')
+  openEdit(copy)
+}
 </script>
 
 <template>
@@ -168,6 +175,7 @@ function removePlan(plan: StudyPlan): void {
 
         <div class="plan-actions">
           <el-button size="small" @click="openEdit(plan)">编辑</el-button>
+          <el-button size="small" type="warning" plain @click="duplicatePlan(plan)">复制</el-button>
           <el-button
             v-if="progress.status !== '已完成'"
             size="small"
