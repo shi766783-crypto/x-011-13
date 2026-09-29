@@ -32,6 +32,27 @@ export const usePlansStore = defineStore('plans', () => {
     persist()
   }
 
+  /**
+   * 复制一份计划副本：保留日期、学时、资源等全部字段，
+   * 资源重新生成 id，名称追加“副本”，不继承原计划的完成状态。
+   * 返回新副本，供调用方在生成后立即进入编辑。
+   */
+  function duplicatePlan(id: string): StudyPlan | undefined {
+    const target = plans.value.find((p) => p.id === id)
+    if (!target) return
+    const copy: StudyPlan = {
+      ...target,
+      id: uid(),
+      name: `${target.name} 副本`,
+      resources: target.resources.map((r) => ({ ...r, id: uid() })),
+      createdAt: new Date().toISOString(),
+      completedAt: undefined,
+    }
+    plans.value.unshift(copy)
+    persist()
+    return copy
+  }
+
   function toggleComplete(id: string): void {
     const target = plans.value.find((p) => p.id === id)
     if (!target) return
@@ -39,5 +60,5 @@ export const usePlansStore = defineStore('plans', () => {
     persist()
   }
 
-  return { plans, addPlan, updatePlan, removePlan, toggleComplete }
+  return { plans, addPlan, updatePlan, removePlan, duplicatePlan, toggleComplete }
 })
